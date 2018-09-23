@@ -85,7 +85,7 @@ var invalidZeroDiffBlock = testBlock{
 	mixDigest:   crypto.Sha3Hash([]byte("bar")),
 }
 
-func TestEthashVerifyValid(t *testing.T) {
+func TestUbqhashVerifyValid(t *testing.T) {
 	eth := New()
 	for i, block := range validBlocks {
 		if !eth.Verify(block) {
@@ -94,14 +94,14 @@ func TestEthashVerifyValid(t *testing.T) {
 	}
 }
 
-func TestEthashVerifyInvalid(t *testing.T) {
+func TestUbqhashVerifyInvalid(t *testing.T) {
 	eth := New()
 	if eth.Verify(&invalidZeroDiffBlock) {
 		t.Errorf("should not validate - we just ensure it does not panic on this block")
 	}
 }
 
-func TestEthashConcurrentVerify(t *testing.T) {
+func TestUbqhashConcurrentVerify(t *testing.T) {
 	eth, err := NewForTesting()
 	if err != nil {
 		t.Fatal(err)
@@ -127,7 +127,7 @@ func TestEthashConcurrentVerify(t *testing.T) {
 	wg.Wait()
 }
 
-func TestEthashConcurrentSearch(t *testing.T) {
+func TestUbqhashConcurrentSearch(t *testing.T) {
 	eth, err := NewForTesting()
 	if err != nil {
 		t.Fatal(err)
@@ -174,7 +174,7 @@ func TestEthashConcurrentSearch(t *testing.T) {
 	}
 }
 
-func TestEthashSearchAcrossEpoch(t *testing.T) {
+func TestUbqhashSearchAcrossEpoch(t *testing.T) {
 	eth, err := NewForTesting()
 	if err != nil {
 		t.Fatal(err)
