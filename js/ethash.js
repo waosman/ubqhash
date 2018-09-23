@@ -1,4 +1,4 @@
-// ethash.js
+// ubqhash.js
 // Tim Hughes <tim@twistedfury.com>
 // Revision 19
 

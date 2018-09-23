@@ -17,31 +17,31 @@ else:
         'src/libubqhash/io_posix.c'
     ]
 depends = [
-    'src/libubqhash/ethash.h',
+    'src/libubqhash/ubqhash.h',
     'src/libubqhash/compiler.h',
     'src/libubqhash/data_sizes.h',
     'src/libubqhash/endian.h',
-    'src/libubqhash/ethash.h',
+    'src/libubqhash/ubqhash.h',
     'src/libubqhash/io.h',
     'src/libubqhash/fnv.h',
     'src/libubqhash/internal.h',
     'src/libubqhash/sha3.h',
     'src/libubqhash/util.h',
 ]
-pyethash = Extension('pyethash',
+pyubqhash = Extension('pyubqhash',
                      sources=sources,
                      depends=depends,
                      extra_compile_args=["-Isrc/", "-std=gnu99", "-Wall"])
 
 setup(
-    name='pyethash',
+    name='pyubqhash',
     author="Matthew Wampler-Doty",
     author_email="matthew.wampler.doty@gmail.com",
     license='GPL',
     version='0.1.23',
-    url='https://github.com/ethereum/ethash',
-    download_url='https://github.com/ethereum/ethash/tarball/v23',
-    description=('Python wrappers for ethash, the ethereum proof of work'
+    url='https://github.com/ethereum/ubqhash',
+    download_url='https://github.com/ethereum/ubqhash/tarball/v23',
+    description=('Python wrappers for ubqhash, the ethereum proof of work'
                  'hashing function'),
-    ext_modules=[pyethash],
+    ext_modules=[pyubqhash],
 )

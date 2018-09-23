@@ -62,5 +62,5 @@ IF (Boost_FOUND)
     endif()
 
     enable_testing ()
-    add_test(NAME ethash COMMAND Test)
+    add_test(NAME ubqhash COMMAND Test)
 ENDIF()

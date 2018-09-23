@@ -10,7 +10,7 @@ include src/python/core.c
 include src/libubqhash/compiler.h
 include src/libubqhash/data_sizes.h
 include src/libubqhash/endian.h
-include src/libubqhash/ethash.h
+include src/libubqhash/ubqhash.h
 include src/libubqhash/fnv.h
 include src/libubqhash/internal.h
 include src/libubqhash/sha3.h

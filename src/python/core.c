@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <time.h>
-#include "../libubqhash/ethash.h"
+#include "../libubqhash/ubqhash.h"
 #include "../libubqhash/internal.h"
 
 #if PY_MAJOR_VERSION >= 3
@@ -24,7 +24,7 @@ mkcache_bytes(PyObject *self, PyObject *args) {
     if (!PyArg_ParseTuple(args, "k", &block_number))
         return 0;
 
-    ethash_light_t L = ethash_light_new(block_number);
+    ubqhash_light_t L = ubqhash_light_new(block_number);
     PyObject * val = Py_BuildValue(PY_STRING_FORMAT, L->cache, L->cache_size);
     free(L->cache);
     return val;
@@ -54,13 +54,13 @@ calc_dataset_bytes(PyObject *self, PyObject *args) {
         return 0;
     }
 
-    ethash_params params;
+    ubqhash_params params;
     params.cache_size = (size_t) cache_size;
     params.full_size = (size_t) full_size;
-    ethash_cache cache;
+    ubqhash_cache cache;
     cache.mem = (void *) cache_bytes;
     void *mem = malloc(params.full_size);
-    ethash_compute_full_data(mem, &params, &cache);
+    ubqhash_compute_full_data(mem, &params, &cache);
     PyObject * val = Py_BuildValue(PY_STRING_FORMAT, (char *) mem, full_size);
     free(mem);
     return val;
@@ -82,15 +82,15 @@ hashimoto_light(PyObject *self, PyObject *args) {
         PyErr_SetString(PyExc_ValueError, error_message);
         return 0;
     }
-    struct ethash_light *s;
+    struct ubqhash_light *s;
     s = calloc(sizeof(*s), 1);
     s->cache = cache_bytes;
     s->cache_size = cache_size;
     s->block_number = block_number;
-    struct ethash_h256 *h;
+    struct ubqhash_h256 *h;
     h = calloc(sizeof(*h), 1);
     for (int i = 0; i < 32; i++) h->b[i] = header[i];
-    struct ethash_return_value out = ethash_light_compute(s, *h, nonce);
+    struct ubqhash_return_value out = ubqhash_light_compute(s, *h, nonce);
     return Py_BuildValue("{" PY_CONST_STRING_FORMAT ":" PY_STRING_FORMAT "," PY_CONST_STRING_FORMAT ":" PY_STRING_FORMAT "}",
                          "mix digest", &out.mix_hash, 32,
                          "result", &out.result, 32);
@@ -122,10 +122,10 @@ hashimoto_full(PyObject *self, PyObject *args) {
     }
 
 
-    ethash_return_value out;
-    ethash_params params;
+    ubqhash_return_value out;
+    ubqhash_params params;
     params.full_size = (size_t) full_size;
-    ethash_full(&out, (void *) full_bytes, &params, (ethash_h256_t *) header, nonce);
+    ubqhash_full(&out, (void *) full_bytes, &params, (ubqhash_h256_t *) header, nonce);
     return Py_BuildValue("{" PY_CONST_STRING_FORMAT ":" PY_STRING_FORMAT ", " PY_CONST_STRING_FORMAT ":" PY_STRING_FORMAT "}",
                          "mix digest", &out.mix_hash, 32,
                          "result", &out.result, 32);
@@ -165,15 +165,15 @@ mine(PyObject *self, PyObject *args) {
         return 0;
     }
 
-    ethash_return_value out;
-    ethash_params params;
+    ubqhash_return_value out;
+    ubqhash_params params;
     params.full_size = (size_t) full_size;
 
     // TODO: Multi threading?
     do {
-        ethash_full(&out, (void *) full_bytes, &params, (const ethash_h256_t *) header, nonce++);
+        ubqhash_full(&out, (void *) full_bytes, &params, (const ubqhash_h256_t *) header, nonce++);
         // TODO: disagrees with the spec https://github.com/ethereum/wiki/wiki/Ubqhash#mining
-    } while (!ethash_check_difficulty(&out.result, (const ethash_h256_t *) difficulty));
+    } while (!ubqhash_check_difficulty(&out.result, (const ubqhash_h256_t *) difficulty));
 
     return Py_BuildValue("{" PY_CONST_STRING_FORMAT ":" PY_STRING_FORMAT ", " PY_CONST_STRING_FORMAT ":" PY_STRING_FORMAT ", " PY_CONST_STRING_FORMAT ":K}",
             "mix digest", &out.mix_hash, 32,
@@ -195,11 +195,11 @@ get_seedhash(PyObject *self, PyObject *args) {
         PyErr_SetString(PyExc_ValueError, error_message);
         return 0;
     }
-    ethash_h256_t seedhash = ethash_get_seedhash(block_number);
+    ubqhash_h256_t seedhash = ubqhash_get_seedhash(block_number);
     return Py_BuildValue(PY_STRING_FORMAT, (char *) &seedhash, 32);
 }
 
-static PyMethodDef PyethashMethods[] =
+static PyMethodDef PyubqhashMethods[] =
         {
                 {"get_seedhash", get_seedhash, METH_VARARGS,
                         "get_seedhash(block_number)\n\n"
@@ -223,16 +223,16 @@ static PyMethodDef PyethashMethods[] =
         };
 
 #if PY_MAJOR_VERSION >= 3
-static struct PyModuleDef PyethashModule = {
+static struct PyModuleDef PyubqhashModule = {
     PyModuleDef_HEAD_INIT,
-    "pyethash",
+    "pyubqhash",
     "...",
     -1,
-    PyethashMethods
+    PyubqhashMethods
 };
 
-PyMODINIT_FUNC PyInit_pyethash(void) {
-    PyObject *module =  PyModule_Create(&PyethashModule);
+PyMODINIT_FUNC PyInit_pyubqhash(void) {
+    PyObject *module =  PyModule_Create(&PyubqhashModule);
     // Following Spec: https://github.com/ethereum/wiki/wiki/Ubqhash#definitions
     PyModule_AddIntConstant(module, "REVISION", (long) UBQHASH_REVISION);
     PyModule_AddIntConstant(module, "DATASET_BYTES_INIT", (long) UBQHASH_DATASET_BYTES_INIT);
@@ -249,8 +249,8 @@ PyMODINIT_FUNC PyInit_pyethash(void) {
 }
 #else
 PyMODINIT_FUNC
-initpyethash(void) {
-    PyObject *module = Py_InitModule("pyethash", PyethashMethods);
+initpyubqhash(void) {
+    PyObject *module = Py_InitModule("pyubqhash", PyubqhashMethods);
     // Following Spec: https://github.com/ethereum/wiki/wiki/Ubqhash#definitions
     PyModule_AddIntConstant(module, "REVISION", (long) UBQHASH_REVISION);
     PyModule_AddIntConstant(module, "DATASET_BYTES_INIT", (long) UBQHASH_DATASET_BYTES_INIT);

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with the go-ethereum library. If not, see <http://www.gnu.org/licenses/>.
 
-package ethash
+package ubqhash
 
 /*
  -mno-stack-arg-probe disables stack probing which avoids the function
@@ -44,8 +44,8 @@ package ethash
 #endif
 
 // 'gateway function' for calling back into go.
-extern int ethashGoCallback(unsigned);
-int ethashGoCallback_cgo(unsigned percent) { return ethashGoCallback(percent); }
+extern int ubqhashGoCallback(unsigned);
+int ubqhashGoCallback_cgo(unsigned percent) { return ubqhashGoCallback(percent); }
 
 */
 import "C"
