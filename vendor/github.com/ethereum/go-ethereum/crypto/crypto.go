@@ -27,9 +27,9 @@ import (
 	"math/big"
 	"os"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto/sha3"
-	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/ubiq/go-ubiq/common"
+	"github.com/ubiq/go-ubiq/crypto/sha3"
+	"github.com/ubiq/go-ubiq/rlp"
 )
 
 var (
