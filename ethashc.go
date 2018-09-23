@@ -32,15 +32,15 @@ package ethash
 #cgo windows CFLAGS: -mno-stack-arg-probe
 #cgo LDFLAGS: -lm
 
-#include "src/libethash/internal.c"
-#include "src/libethash/sha3.c"
-#include "src/libethash/io.c"
+#include "src/libubqhash/internal.c"
+#include "src/libubqhash/sha3.c"
+#include "src/libubqhash/io.c"
 
 #ifdef _WIN32
-#	include "src/libethash/io_win32.c"
-#	include "src/libethash/mmap_win32.c"
+#	include "src/libubqhash/io_win32.c"
+#	include "src/libubqhash/mmap_win32.c"
 #else
-#	include "src/libethash/io_posix.c"
+#	include "src/libubqhash/io_posix.c"
 #endif
 
 // 'gateway function' for calling back into go.

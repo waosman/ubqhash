@@ -3,30 +3,30 @@ import os
 from distutils.core import setup, Extension
 sources = [
     'src/python/core.c',
-    'src/libethash/io.c',
-    'src/libethash/internal.c',
-    'src/libethash/sha3.c']
+    'src/libubqhash/io.c',
+    'src/libubqhash/internal.c',
+    'src/libubqhash/sha3.c']
 if os.name == 'nt':
     sources += [
-        'src/libethash/util_win32.c',
-        'src/libethash/io_win32.c',
-        'src/libethash/mmap_win32.c',
+        'src/libubqhash/util_win32.c',
+        'src/libubqhash/io_win32.c',
+        'src/libubqhash/mmap_win32.c',
     ]
 else:
     sources += [
-        'src/libethash/io_posix.c'
+        'src/libubqhash/io_posix.c'
     ]
 depends = [
-    'src/libethash/ethash.h',
-    'src/libethash/compiler.h',
-    'src/libethash/data_sizes.h',
-    'src/libethash/endian.h',
-    'src/libethash/ethash.h',
-    'src/libethash/io.h',
-    'src/libethash/fnv.h',
-    'src/libethash/internal.h',
-    'src/libethash/sha3.h',
-    'src/libethash/util.h',
+    'src/libubqhash/ethash.h',
+    'src/libubqhash/compiler.h',
+    'src/libubqhash/data_sizes.h',
+    'src/libubqhash/endian.h',
+    'src/libubqhash/ethash.h',
+    'src/libubqhash/io.h',
+    'src/libubqhash/fnv.h',
+    'src/libubqhash/internal.h',
+    'src/libubqhash/sha3.h',
+    'src/libubqhash/util.h',
 ]
 pyethash = Extension('pyethash',
                      sources=sources,
