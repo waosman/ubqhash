@@ -7,9 +7,11 @@
 #ifdef WITH_CRYPTOPP
 
 #include <libubqhash/sha3_cryptopp.h>
+#include <libubqhash/blake2_cryptopp.h>
 
 #else
 #include <libubqhash/sha3.h>
+#include <libubqhash/blake2.h>
 #endif // WITH_CRYPTOPP
 
 #ifdef _WIN32

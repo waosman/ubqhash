@@ -36,9 +36,11 @@
 #ifdef WITH_CRYPTOPP
 
 #include "sha3_cryptopp.h"
+#include "blake2_cryptopp.h"
 
 #else
 #include "sha3.h"
+#include "blake2.h"
 #endif // WITH_CRYPTOPP
 
 uint64_t ubqhash_get_datasize(uint64_t const block_number)
@@ -275,8 +277,13 @@ ubqhash_h256_t ubqhash_get_seedhash(uint64_t block_number)
 	ubqhash_h256_t ret;
 	ubqhash_h256_reset(&ret);
 	uint64_t const epochs = block_number / UBQHASH_EPOCH_LENGTH;
-	for (uint32_t i = 0; i < epochs; ++i)
-		SHA3_256(&ret, (uint8_t*)&ret, 32);
+	if (epochs >= UBQHASH_UIP1_EPOCH) {
+		for (uint32_t i = 0; i < epochs; ++i)
+			BLAKE2S_256(&ret, (uint8_t*)&ret, 32);
+	} else {
+		for (uint32_t i = 0; i < epochs; ++i)
+			SHA3_256(&ret, (uint8_t*)&ret, 32);
+	}
 	return ret;
 }
 

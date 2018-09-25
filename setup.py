@@ -5,7 +5,8 @@ sources = [
     'src/python/core.c',
     'src/libubqhash/io.c',
     'src/libubqhash/internal.c',
-    'src/libubqhash/sha3.c']
+    'src/libubqhash/sha3.c',
+    'src/libubqhash/blake2s-ref.c']
 if os.name == 'nt':
     sources += [
         'src/libubqhash/util_win32.c',
@@ -26,6 +27,7 @@ depends = [
     'src/libubqhash/fnv.h',
     'src/libubqhash/internal.h',
     'src/libubqhash/sha3.h',
+    'src/libubqhash/blake2.h',
     'src/libubqhash/util.h',
 ]
 pyubqhash = Extension('pyubqhash',
