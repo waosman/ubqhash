@@ -34,6 +34,7 @@ package ubqhash
 
 #include "src/libubqhash/internal.c"
 #include "src/libubqhash/sha3.c"
+#include "src/libubqhash/blake2s-ref.c"
 #include "src/libubqhash/io.c"
 
 #ifdef _WIN32
