@@ -44,7 +44,6 @@ import (
 	"github.com/ubiq/go-ubiq/crypto"
 	"github.com/ubiq/go-ubiq/logger"
 	"github.com/ubiq/go-ubiq/logger/glog"
-	"golang.org/x/crypto/blake2s"
 )
 
 var (
@@ -444,29 +443,8 @@ func GetSeedHash(blockNum uint64) ([]byte, error) {
 }
 
 func makeSeedHash(epoch uint64) (sh common.Hash) {
-	if epoch >= uip1Epoch {
-		for ; epoch > 0; epoch-- {
-			sh = Blake2s256Hash(sh[:])
-		}
-
-	} else {
-		for ; epoch > 0; epoch-- {
-			sh = crypto.Sha3Hash(sh[:])
-		}
+	for ; epoch > 0; epoch-- {
+		sh = crypto.Sha3Hash(sh[:])
 	}
 	return sh
 }
-
-func Blake2s256Hash(data ...[]byte) (h common.Hash) {
-	d, err := blake2s.New256(nil)
-	if err != nil {
-		fmt.Errorf("Blake2s256Hash error")
-	}
-	for _, b := range data {
-		d.Write(b)
-	}
-	d.Sum(h[:0])
-	return h
-}
-
-func Blake2sHash(data ...[]byte) common.Hash { return Blake2s256Hash(data...) }
