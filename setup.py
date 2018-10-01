@@ -6,7 +6,7 @@ sources = [
     'src/libubqhash/io.c',
     'src/libubqhash/internal.c',
     'src/libubqhash/sha3.c',
-    'src/libubqhash/blake2s-ref.c']
+    'src/libubqhash/blake2b-ref.c']
 if os.name == 'nt':
     sources += [
         'src/libubqhash/util_win32.c',

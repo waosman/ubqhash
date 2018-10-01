@@ -150,8 +150,15 @@ struct ubqhash_h256;
   int blake2s_update( blake2s_state *S, const void *in, size_t inlen );
   int blake2s_final( blake2s_state *S, void *out, size_t outlen );
 
+  int blake2b_init( blake2b_state *S, size_t outlen );
+  int blake2b_init_key( blake2b_state *S, size_t outlen, const void *key, size_t keylen );
+  int blake2b_init_param( blake2b_state *S, const blake2b_param *P );
+  int blake2b_update( blake2b_state *S, const void *in, size_t inlen );
+  int blake2b_final( blake2b_state *S, void *out, size_t outlen );
+
   /* Simple API */
   int blake2s( void *out, size_t outlen, const void *in, size_t inlen, const void *key, size_t keylen );
+  int blake2b( void *out, size_t outlen, const void *in, size_t inlen, const void *key, size_t keylen );
 
   /* This is simply an alias for blake2b */
   int blake2( void *out, size_t outlen, const void *in, size_t inlen, const void *key, size_t keylen );
@@ -159,6 +166,11 @@ struct ubqhash_h256;
   static inline void BLAKE2S_256(struct ubqhash_h256 const* ret, uint8_t const* data, size_t const size)
   {
     blake2s((uint8_t*)ret, 32, data, size, 0, 0 );
+  }
+
+  static inline void BLAKE2B_512(uint8_t* ret, uint8_t const* data, size_t const size)
+  {
+    blake2b(ret, 64, data, size, 0, 0 );
   }
 
 #if defined(__cplusplus)

@@ -29,4 +29,9 @@ void BLAKE2S_256(ubqhash_h256_t const* ret, uint8_t const* data, size_t size)
 {
 	CryptoPP::BLAKE2s().CalculateDigest((uint8_t*)ret, data, size);
 }
+
+void BLAKE2B_512(uint8_t* const ret, uint8_t const* data, size_t size)
+{
+	CryptoPP::BLAKE2b().CalculateDigest(ret, data, size);
+}
 }

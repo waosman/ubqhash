@@ -92,6 +92,40 @@ bool static ubqhash_compute_cache_nodes(
 	return true;
 }
 
+bool static ubqhash_compute_cache_nodes_uip1(
+	node* const nodes,
+	uint64_t cache_size,
+	ubqhash_h256_t const* seed
+)
+{
+	if (cache_size % sizeof(node) != 0) {
+		return false;
+	}
+	uint32_t const num_nodes = (uint32_t) (cache_size / sizeof(node));
+
+	BLAKE2B_512(nodes[0].bytes, (uint8_t*)seed, 32);
+
+	for (uint32_t i = 1; i != num_nodes; ++i) {
+		BLAKE2B_512(nodes[i].bytes, nodes[i - 1].bytes, 64);
+	}
+
+	for (uint32_t j = 0; j != UBQHASH_CACHE_ROUNDS; j++) {
+		for (uint32_t i = 0; i != num_nodes; i++) {
+			uint32_t const idx = nodes[i].words[0] % num_nodes;
+			node data;
+			data = nodes[(num_nodes - 1 + i) % num_nodes];
+			for (uint32_t w = 0; w != NODE_WORDS; ++w) {
+				data.words[w] ^= nodes[idx].words[w];
+			}
+			BLAKE2B_512(nodes[i].bytes, data.bytes, sizeof(data));
+		}
+	}
+
+	// now perform endian conversion
+	fix_endian_arr32(nodes->words, num_nodes * NODE_WORDS);
+	return true;
+}
+
 void ubqhash_calculate_dag_item(
 	node* const ret,
 	uint32_t node_index,
@@ -277,13 +311,8 @@ ubqhash_h256_t ubqhash_get_seedhash(uint64_t block_number)
 	ubqhash_h256_t ret;
 	ubqhash_h256_reset(&ret);
 	uint64_t const epochs = block_number / UBQHASH_EPOCH_LENGTH;
-	if (epochs >= UBQHASH_UIP1_EPOCH) {
-		for (uint32_t i = 0; i < epochs; ++i)
-			BLAKE2S_256(&ret, (uint8_t*)&ret, 32);
-	} else {
-		for (uint32_t i = 0; i < epochs; ++i)
-			SHA3_256(&ret, (uint8_t*)&ret, 32);
-	}
+	for (uint32_t i = 0; i < epochs; ++i)
+		SHA3_256(&ret, (uint8_t*)&ret, 32);
 	return ret;
 }
 
@@ -300,7 +329,7 @@ bool ubqhash_quick_check_difficulty(
 	return ubqhash_check_difficulty(&return_hash, boundary);
 }
 
-ubqhash_light_t ubqhash_light_new_internal(uint64_t cache_size, ubqhash_h256_t const* seed)
+ubqhash_light_t ubqhash_light_new_internal(uint64_t cache_size, ubqhash_h256_t const* seed, bool uip1)
 {
 	struct ubqhash_light *ret;
 	ret = calloc(sizeof(*ret), 1);
@@ -312,8 +341,14 @@ ubqhash_light_t ubqhash_light_new_internal(uint64_t cache_size, ubqhash_h256_t c
 		goto fail_free_light;
 	}
 	node* nodes = (node*)ret->cache;
-	if (!ubqhash_compute_cache_nodes(nodes, cache_size, seed)) {
-		goto fail_free_cache_mem;
+	if (uip1) {
+		if (!ubqhash_compute_cache_nodes_uip1(nodes, cache_size, seed)) {
+			goto fail_free_cache_mem;
+		}
+	} else {
+		if (!ubqhash_compute_cache_nodes(nodes, cache_size, seed)) {
+			goto fail_free_cache_mem;
+		}
 	}
 	ret->cache_size = cache_size;
 	return ret;
@@ -329,7 +364,11 @@ ubqhash_light_t ubqhash_light_new(uint64_t block_number)
 {
 	ubqhash_h256_t seedhash = ubqhash_get_seedhash(block_number);
 	ubqhash_light_t ret;
-	ret = ubqhash_light_new_internal(ubqhash_get_cachesize(block_number), &seedhash);
+	if (block_number >= 30000) {
+		ret = ubqhash_light_new_internal(ubqhash_get_cachesize(block_number), &seedhash, true);
+	} else {
+		ret = ubqhash_light_new_internal(ubqhash_get_cachesize(block_number), &seedhash, false);
+	}
 	ret->block_number = block_number;
 	return ret;
 }

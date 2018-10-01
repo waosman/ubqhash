@@ -243,7 +243,7 @@ BOOST_AUTO_TEST_CASE(test_ubqhash_io_memo_file_match) {
 	cache_size = 1024;
 	full_size = 1024 * 32;
 
-	ubqhash_light_t light = ubqhash_light_new_internal(cache_size, &seed);
+	ubqhash_light_t light = ubqhash_light_new_internal(cache_size, &seed, false);
 	ubqhash_full_t full = ubqhash_full_new_internal(
 		"./test_ubqhash_directory/",
 		seed,
@@ -331,7 +331,7 @@ BOOST_AUTO_TEST_CASE(light_and_full_client_checks) {
 	cache_size = 1024;
 	full_size = 1024 * 32;
 
-	ubqhash_light_t light = ubqhash_light_new_internal(cache_size, &seed);
+	ubqhash_light_t light = ubqhash_light_new_internal(cache_size, &seed, false);
 	ubqhash_full_t full = ubqhash_full_new_internal(
 		"./test_ubqhash_directory/",
 		seed,
@@ -455,7 +455,7 @@ BOOST_AUTO_TEST_CASE(ubqhash_full_new_when_dag_exists_with_wrong_size) {
 	fclose(f);
 
 	// then create new DAG, which should detect the wrong size and force create a new file
-	ubqhash_light_t light = ubqhash_light_new_internal(cache_size, &seed);
+	ubqhash_light_t light = ubqhash_light_new_internal(cache_size, &seed, false);
 	BOOST_ASSERT(light);
 	ubqhash_full_t full = ubqhash_full_new_internal(
 		"./test_ubqhash_directory/",
@@ -530,7 +530,7 @@ BOOST_AUTO_TEST_CASE(full_client_callback) {
 	cache_size = 1024;
 	full_size = 1024 * 32;
 
-	ubqhash_light_t light = ubqhash_light_new_internal(cache_size, &seed);
+	ubqhash_light_t light = ubqhash_light_new_internal(cache_size, &seed, false);
 	ubqhash_full_t full = ubqhash_full_new_internal(
 		"./test_ubqhash_directory/",
 		seed,
@@ -558,7 +558,7 @@ BOOST_AUTO_TEST_CASE(failing_full_client_callback) {
 	cache_size = 1024;
 	full_size = 1024 * 32;
 
-	ubqhash_light_t light = ubqhash_light_new_internal(cache_size, &seed);
+	ubqhash_light_t light = ubqhash_light_new_internal(cache_size, &seed, false);
 	ubqhash_full_t full = ubqhash_full_new_internal(
 		"./test_ubqhash_directory/",
 		seed,
@@ -582,7 +582,7 @@ BOOST_AUTO_TEST_CASE(test_incomplete_dag_file) {
 	cache_size = 1024;
 	full_size = 1024 * 32;
 
-	ubqhash_light_t light = ubqhash_light_new_internal(cache_size, &seed);
+	ubqhash_light_t light = ubqhash_light_new_internal(cache_size, &seed, false);
 	// create a full but stop at 30%, so no magic number is written
 	ubqhash_full_t full = ubqhash_full_new_internal(
 		"./test_ubqhash_directory/",

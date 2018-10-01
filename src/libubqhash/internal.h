@@ -93,7 +93,7 @@ struct ubqhash_light {
  * @return              Newly allocated ubqhash_light handler or NULL in case of
  *                      ERRNOMEM or invalid parameters used for @ref ubqhash_compute_cache_nodes()
  */
-ubqhash_light_t ubqhash_light_new_internal(uint64_t cache_size, ubqhash_h256_t const* seed);
+ubqhash_light_t ubqhash_light_new_internal(uint64_t cache_size, ubqhash_h256_t const* seed, bool uip1);
 
 /**
  * Calculate the light client data. Internal version.

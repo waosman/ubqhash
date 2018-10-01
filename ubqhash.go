@@ -95,7 +95,11 @@ func (cache *cache) generate() {
 		if cache.test {
 			size = cacheSizeForTesting
 		}
-		cache.ptr = C.ubqhash_light_new_internal(size, (*C.ubqhash_h256_t)(unsafe.Pointer(&seedHash[0])))
+		if cache.epoch >= 1 {
+			cache.ptr = C.ubqhash_light_new_internal(size, (*C.ubqhash_h256_t)(unsafe.Pointer(&seedHash[0])), true)
+		} else {
+			cache.ptr = C.ubqhash_light_new_internal(size, (*C.ubqhash_h256_t)(unsafe.Pointer(&seedHash[0])), false)
+		}
 		runtime.SetFinalizer(cache, freeCache)
 		glog.V(logger.Debug).Infof("Done generating cache for epoch %d, it took %v", cache.epoch, time.Since(started))
 	})
@@ -260,7 +264,12 @@ func (d *dag) generate() {
 		glog.V(logger.Info).Infof("Generating DAG for epoch %d (size %d) (%x)", d.epoch, dagSize, seedHash)
 		// Generate a temporary cache.
 		// TODO: this could share the cache with Light
-		cache := C.ubqhash_light_new_internal(cacheSize, (*C.ubqhash_h256_t)(unsafe.Pointer(&seedHash[0])))
+		var cache C.ubqhash_light_t
+		if blockNum >= 30000 {
+			cache = C.ubqhash_light_new_internal(cacheSize, (*C.ubqhash_h256_t)(unsafe.Pointer(&seedHash[0])), true)
+		} else {
+			cache = C.ubqhash_light_new_internal(cacheSize, (*C.ubqhash_h256_t)(unsafe.Pointer(&seedHash[0])), false)
+		}
 		defer C.ubqhash_light_delete(cache)
 		// Generate the actual DAG.
 		d.ptr = C.ubqhash_full_new_internal(
