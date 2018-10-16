@@ -10,7 +10,6 @@ extern "C" {
 
 struct ubqhash_h256;
 
-void BLAKE2S_256(struct ubqhash_h256 const* ret, uint8_t const* data, size_t size);
 void BLAKE2B_512(uint8_t* const ret, uint8_t const* data, size_t size);
 
 #ifdef __cplusplus
