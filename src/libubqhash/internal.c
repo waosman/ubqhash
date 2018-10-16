@@ -364,7 +364,7 @@ ubqhash_light_t ubqhash_light_new(uint64_t block_number)
 {
 	ubqhash_h256_t seedhash = ubqhash_get_seedhash(block_number);
 	ubqhash_light_t ret;
-	if (block_number >= 30000) {
+	if (block_number >= UBQHASH_EPOCH_LENGTH * UBQHASH_UIP1_EPOCH) {
 		ret = ubqhash_light_new_internal(ubqhash_get_cachesize(block_number), &seedhash, true);
 	} else {
 		ret = ubqhash_light_new_internal(ubqhash_get_cachesize(block_number), &seedhash, false);

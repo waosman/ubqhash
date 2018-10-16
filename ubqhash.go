@@ -55,7 +55,7 @@ const (
 	epochLength         uint64     = 30000
 	cacheSizeForTesting C.uint64_t = 1024
 	dagSizeForTesting   C.uint64_t = 1024 * 32
-	uip1Epoch           uint64     = 1
+	uip1Epoch           uint64     = 22
 )
 
 var DefaultDir = defaultDir()
@@ -94,7 +94,7 @@ func (cache *cache) generate() {
 		if cache.test {
 			size = cacheSizeForTesting
 		}
-		if cache.epoch >= 1 {
+		if cache.epoch >= uip1Epoch {
 			cache.ptr = C.ubqhash_light_new_internal(size, (*C.ubqhash_h256_t)(unsafe.Pointer(&seedHash[0])), true)
 		} else {
 			cache.ptr = C.ubqhash_light_new_internal(size, (*C.ubqhash_h256_t)(unsafe.Pointer(&seedHash[0])), false)
@@ -264,7 +264,7 @@ func (d *dag) generate() {
 		// Generate a temporary cache.
 		// TODO: this could share the cache with Light
 		var cache C.ubqhash_light_t
-		if blockNum >= 30000 {
+		if blockNum >= C.uint64_t(uip1Epoch*epochLength) {
 			cache = C.ubqhash_light_new_internal(cacheSize, (*C.ubqhash_h256_t)(unsafe.Pointer(&seedHash[0])), true)
 		} else {
 			cache = C.ubqhash_light_new_internal(cacheSize, (*C.ubqhash_h256_t)(unsafe.Pointer(&seedHash[0])), false)
