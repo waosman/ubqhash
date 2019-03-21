@@ -130,27 +130,36 @@ type Light struct {
 	NumCaches int // Maximum number of caches to keep before eviction (only init, don't modify)
 }
 
+
 // Verify checks whether the block's nonce is valid.
-func (l *Light) Verify(block Block) bool {
+func (l *Light) VerifyShare(block Block, shareDiff *big.Int) (bool, bool, int64, common.Hash) {
+	// For return arguments
+	zeroHash := common.Hash{}
+
 	// TODO: do ubqhash_quick_verify before getCache in order
 	// to prevent DOS attacks.
 	blockNum := block.NumberU64()
 	if blockNum >= epochLength*2048 {
 		glog.V(logger.Debug).Infof("block number %d too high, limit is %d", blockNum, epochLength*2048)
-		return false
+		return false, false, 0, zeroHash
 	}
 
-	difficulty := block.Difficulty()
+	blockDiff := block.Difficulty()
 	/* Cannot happen if block header diff is validated prior to PoW, but can
 		 happen if PoW is checked first due to parallel PoW checking.
 		 We could check the minimum valid difficulty but for SoC we avoid (duplicating)
 	   Ethereum protocol consensus rules here which are not in scope of Ubqhash
 	*/
-	if difficulty.Cmp(common.Big0) == 0 {
+	if blockDiff.Cmp(common.Big0) == 0 {
 		glog.V(logger.Debug).Infof("invalid block difficulty")
-		return false
+		return false, false, 0, zeroHash
 	}
-
+	
+	if shareDiff.Cmp(common.Big0) == 0 {
+		glog.V(logger.Debug).Infof("invalid share difficulty")
+		return false, false, 0, zeroHash
+	}
+	
 	cache := l.getCache(blockNum)
 	dagSize := C.ubqhash_get_datasize(C.uint64_t(blockNum))
 	if l.test {
@@ -159,17 +168,25 @@ func (l *Light) Verify(block Block) bool {
 	// Recompute the hash using the cache.
 	ok, mixDigest, result := cache.compute(uint64(dagSize), block.HashNoNonce(), block.Nonce())
 	if !ok {
-		return false
+		return false, false, 0, zeroHash
 	}
 
 	// avoid mixdigest malleability as it's not included in a block's "hashNononce"
-	if block.MixDigest() != mixDigest {
-		return false
+	if blkMix := block.MixDigest(); blkMix != zeroHash && blkMix != mixDigest {
+		return false, false, 0, zeroHash
 	}
 
 	// The actual check.
-	target := new(big.Int).Div(maxUint256, difficulty)
-	return result.Big().Cmp(target) <= 0
+	blockTarget := new(big.Int).Div(maxUint256, blockDiff)
+	shareTarget := new(big.Int).Div(maxUint256, shareDiff)
+	actualDiff := new(big.Int).Div(maxUint256, result.Big())
+	return result.Big().Cmp(shareTarget) <= 0, result.Big().Cmp(blockTarget) <= 0, actualDiff.Int64(), mixDigest
+}
+
+// Verify checks whether the block's nonce is valid.
+func (l *Light) Verify(block Block) (bool) {
+	_, ok, _, _ := l.VerifyShare(block, block.Difficulty())
+	return ok
 }
 
 func h256ToHash(in C.ubqhash_h256_t) common.Hash {
